@@ -1,0 +1,99 @@
+step-1 :install kafka from the offical kafka site
+https://kafka.apache.org/downloads
+
+ex:Binary downloads:       (anyone binary file)
+Scala 2.12  - kafka_2.12-3.7.1.tgz (asc, sha512)
+Scala 2.13  - kafka_2.13-3.7.1.tgz (asc, sha512) 
+
+step-2:
+#extract file and extracted file moved into C location path
+
+step-3:
+#need to verify setup available in system environment variables
+java -version
+java
+kafka 
+
+(C:/kafka/)
+#create the folders name data,zookeeper, kafka under the kafka installation
+data
+|
+zookeeper
+kafka
+
+#open the path (C:/kafka/config/zookeeper.properties)
+change the dir, from dataDir=temp/zookeeper to dataDir=C:/kafka_2.13-3.7.0/data/zookeeper
+#open the path (C:/kafka/config/server.properties)
+change the dir, from dataDir=temp/kafka-logs to dataDir=C:/kafka_2.13-3.7.0/data/kafka
+
+
+#open cmd prompt the kafka location directory, to start the zookeeper server (C:/kafka/)
+.\bin\windows\zookeeper-server-start.bat .\config\zookeeper.properties
+
+
+.\bin\windows\kafka-server-start.bat .\config\server.properties
+
+step-4:
+#create the kafka topics before start the producer and consumer, if not required kafka topicsby using cmd prompt (C:/kafka/bin/windows/)
+kafka-topics.bat --list --bootstrap-server localhost:9092
+
+kafka-topics.bat --bootstrap-server localhost:9092 --topic spark_streaming_data1 --create --partitions 3 --replication-factor 1
+kafka-topics.bat --bootstrap-server localhost:9092 --topic spark_streaming_data2 --create --partitions 3 --replication-factor 1
+kafka-topics.bat --bootstrap-server localhost:9092 --topic spark_streaming_data3 --create --partitions 3 --replication-factor 1
+kafka-topics.bat --bootstrap-server localhost:9092 --topic spark_streaming_data4 --create --partitions 3 --replication-factor 1
+kafka-topics.bat --bootstrap-server localhost:9092 --topic spark_streaming_data5 --create --partitions 3 --replication-factor 1
+
+#publish the message to producer
+kafka-console-producer.bat --topic spark_streaming_data1 --bootstrap-server localhost:9092
+
+#to publish message on multiple producer
+kafka-console-producer.bat --topic spark_streaming_data1,spark_streaming_data2 --bootstrap-server localhost:9092
+
+#to get the message by consumer
+kafka-console-consumer.bat --topic spark_streaming_data1 --bootstrap-server localhost:9092
+
+kafka-console-consumer.bat --topic spark_streaming_data1,spark_streaming_data2 --bootstrap-server localhost:9092
+
+
+#create the producer & consumer group in the kafka process (no need to create the consumer group, give sample it will run under the group name)
+kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic spark_streaming_data1 --group my_consumer_group1
+kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic spark_streaming_data1 --group my_consumer_group2
+kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic spark_streaming_data1 --group my_consumer_group3
+
+#details of the group members
+kafka-consumer-groups.bat --bootstrap-server localhost:9092 --list
+kafka-consumer-groups.bat --bootstrap-server localhost:9092 --describe --group my_consumer_group1
+
+#Command to Consume from Multiple Topics in a Single Group
+kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic topic1,topic2,topic3 --group my_consumer_group1
+
+#Command to Consume from single topics in a Different Groups 
+Consumer Group A:
+kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic my_topic --group my_consumer_group1
+Consumer Group B:
+kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic my_topic --group my_consumer_group2
+
+usage;
+Feature	Multiple 			| multiple Topics, Single Group								|Single Topic, Multiple Groups
+Partition Assignment:	Partitions across all topics are shared among the group.			Partitions are assigned independently within each group.
+Message Duplication:	Messages from a partition are processed by only one consumer in the group.	All groups receive all messages from the topic.
+Use Case:		Consolidated processing across related topics.					Independent processing pipelines for the same data.
+
+examples:
+Example Scenarios:
+Case 1: Multiple Topics, Single Group
+Topics: orders, payments
+Consumer Group: ecommerce_group
+Consumers: 3
+Each consumer processes partitions from both orders and payments.
+
+Case 2: Single Topic, Multiple Groups
+Topic: logs
+Consumer Groups: analytics_group, monitoring_group
+Each group processes all messages from logs independently.
+
+
+
+more reference about kafka process ;
+https://developer.confluent.io/
+https://learn.conduktor.io/

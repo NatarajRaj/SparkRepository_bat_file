@@ -1,0 +1,41 @@
+step-1:
+make dir, C:/kafka_2.13-3.7.0/plugins
+install confluent jdbc connector tool for the frequent database connection
+
+step-2:
+{
+  "name": "jdbc-source-connector",
+  "config": {
+    "connector.class": "io.confluent.connect.jdbc.JdbcSourceConnector",
+    "tasks.max": "1",
+    "connection.url": "jdbc:postgresql://localhost:5432/postgres",
+    "connection.user": "postgres",
+    "connection.password": "postres",
+    "table.whitelist": "salesdata",
+    "mode": "incrementing",
+    "incrementing.column.name": "id",
+    "topic.prefix": "database_salesdata_",
+    "poll.interval.ms": "1000"
+  }
+}
+
+
+create the properties file place it under the C:\kafka_2.13-3.7.0\config path
+
+step-3:
+
+#both distributed cluster mode and stanalone mode update, if which one need run bat file
+(C:\kafka_2.13-3.7.0\config\connect-distributed.bat)
+plugin.path=C:/kafka/plugins/kafka-connect-jdbc
+bootstrap.servers=localhost:9092
+rest.port=8083
+offset.storage.topic=connect-offsets
+config.storage.topic=connect-configs
+status.storage.topic=connect-status
+
+C:\kafka_2.13-3.7.0 (cmd prompt) run the windows bat file
+bin/windows/connect-distributed.bat config/connect-distributed.properties                   
+
+#standalone mode
+create a properties file under the kafka main dir
+.\bin\windows\connect-standalone.bat .\config\connect-standalone.properties .\config\jdbc-source-connector.properties

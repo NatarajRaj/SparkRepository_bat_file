@@ -1,0 +1,15 @@
+Set WshShell = CreateObject("WScript.Shell")
+
+' Running Zookeeper in the background
+WshShell.Run """C:\kafka_2.13-3.7.0\bin\windows\zookeeper-server-start.bat"" C:\kafka_2.13-3.7.0\config\zookeeper.properties", 0, False
+WScript.Sleep 10000 ' Wait for 10 seconds to ensure Zookeeper starts
+
+' Running Kafka Broker in the background
+WshShell.Run """C:\kafka_2.13-3.7.0\bin\windows\kafka-server-start.bat"" C:\kafka_2.13-3.7.0\config\server.properties", 0, False
+WScript.Sleep 10000 ' Wait for 10 seconds to ensure Kafka starts
+
+' Running Kafka Producer in the background
+WshShell.Run """C:\Users\system14\Documents\SparkApplication\kafkaProducer.bat""", 0, False
+
+' Running Kafka Consumer in the background
+WshShell.Run """C:\Users\system14\Documents\SparkApplication\kafkaConsumer.bat""", 0, False
